@@ -9,15 +9,16 @@ const anthropic = new Anthropic({
 });
 
 const MODEL_PRICING: Record<string, { input: number; output: number }> = {
-  'OPUS_4': { input: 0.015, output: 0.06 }, // per 1k tokens
+  'OPUS_4': { input: 0.005, output: 0.025 }, // per 1k tokens
   'SONNET_4': { input: 0.003, output: 0.015 },
-  'HAIKU_4': { input: 0.00025, output: 0.00125 },
+  'HAIKU_4': { input: 0.001, output: 0.005 },
 };
 
+// The LLMModel enum names are historical; they map to the current model IDs.
 const MODEL_NAMES: Record<string, string> = {
-  'OPUS_4': 'claude-opus-4-20250514',
-  'SONNET_4': 'claude-sonnet-4-20250514',
-  'HAIKU_4': 'claude-haiku-4-20250514',
+  'OPUS_4': 'claude-opus-5',
+  'SONNET_4': 'claude-sonnet-5',
+  'HAIKU_4': 'claude-haiku-4-5',
 };
 
 export async function runAgent(agentId: string, input: string, runId: string) {
@@ -48,7 +49,6 @@ export async function runAgent(agentId: string, input: string, runId: string) {
     const response = await anthropic.messages.create({
       model: modelName,
       max_tokens: agent.maxTokens,
-      temperature: agent.temperature,
       system: agent.systemPrompt,
       messages: [
         {
@@ -158,7 +158,6 @@ export async function streamAgentRun(
     const stream = anthropic.messages.stream({
       model: modelName,
       max_tokens: agent.maxTokens,
-      temperature: agent.temperature,
       system: agent.systemPrompt,
       messages: [
         {

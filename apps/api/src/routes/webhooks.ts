@@ -101,6 +101,7 @@ router.post('/trigger/:webhookId', async (req: AuthRequest, res) => {
         userId: 'system', // Webhook runs as system
         input: JSON.stringify(payload),
         status: 'RUNNING',
+        tokenUsage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
       },
     });
 

@@ -36,6 +36,7 @@ router.post('/test', async (req: AuthRequest, res) => {
         userId: req.userId,
         input,
         status: 'RUNNING',
+        tokenUsage: { inputTokens: 0, outputTokens: 0, totalTokens: 0 },
       },
     });
 
