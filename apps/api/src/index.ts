@@ -51,29 +51,33 @@ app.use((req: Request, res: Response) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Start server
-const server = app.listen(port, () => {
-  logger.info(`Server running on port ${port}`);
-  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-});
-
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  logger.info('SIGTERM received, shutting down gracefully');
-  server.close(async () => {
-    await prisma.$disconnect();
-    logger.info('Server closed');
-    process.exit(0);
+// On Vercel the platform owns the listener and imports the app; bind a
+// port only when this file is run directly (local dev, container host).
+if (!process.env.VERCEL) {
+  // Start server
+  const server = app.listen(port, () => {
+    logger.info(`Server running on port ${port}`);
+    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   });
-});
 
-process.on('SIGINT', async () => {
-  logger.info('SIGINT received, shutting down gracefully');
-  server.close(async () => {
-    await prisma.$disconnect();
-    logger.info('Server closed');
-    process.exit(0);
+  // Graceful shutdown
+  process.on('SIGTERM', async () => {
+    logger.info('SIGTERM received, shutting down gracefully');
+    server.close(async () => {
+      await prisma.$disconnect();
+      logger.info('Server closed');
+      process.exit(0);
+    });
   });
-});
+
+  process.on('SIGINT', async () => {
+    logger.info('SIGINT received, shutting down gracefully');
+    server.close(async () => {
+      await prisma.$disconnect();
+      logger.info('Server closed');
+      process.exit(0);
+    });
+  });
+}
 
 export default app;
